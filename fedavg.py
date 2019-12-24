@@ -54,6 +54,49 @@ class Server(BaseFedarated):
 
                 # track communication cost
                 self.metrics.update(rnd=i, cid=c.id, stats=stats)
+                
+  #------------------START OF CODE CHANGE WE WILL APPLY A TOP-K HERE--------------------#
+                
+                #this reformats the csolns matrix into a one dimensional array
+                csolns.reshape(740,1)
+                
+                #start of the manipulation code
+                weight = csolns.copy()
+                top_k_percent = .1 # ten percent
+
+                #creates the weight array in descending order
+                topValue = weight.copy()
+                topValue.sort()
+                topValue.reverse() 
+
+                #creates two arrays for manipulation of weight array
+                evalWeight = weight.copy()
+                residWeight = weight.copy()
+                
+                #findes the top-k value
+                indexVal = int( (len(topValue) - 1 ) * top_k_percent) 
+                topK = topValue[indexVal]
+
+                #makes all values below topK zero
+                for w in range(0,len(evalWeight)):
+                	if evalWeight[w] <= topK:
+                		evalWeight[w] = 0
+
+                #keeps an array of only residules
+                for w in range(0,len(residWeight)):
+                	if residWeight[w] > topK:
+                		residWeight[w] = 0
+
+                #Revaluates Weight array to the residules
+                weight = residWeight.copy()
+
+                csolns = weight.copy()
+                # end of topK code
+    
+                #change csolns back into a multidimensional array
+                csolns.reshape(740,10)
+            
+#------------END OF TOP K ADDITION---------------------------
 
             # update models
             self.latest_model = self.aggregate(csolns)
