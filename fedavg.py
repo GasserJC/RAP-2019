@@ -62,6 +62,8 @@ class Server(BaseFedarated):
                 
                 #start of the manipulation code
                 weight = csolns.copy()
+                
+                # top k amount, it is technically a decimal, not a percent
                 top_k_percent = .1 # ten percent
 
                 #creates the weight array in descending order
