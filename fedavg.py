@@ -89,10 +89,8 @@ class Server(BaseFedarated):
                 	if residWeight[w] > topK:
                 		residWeight[w] = 0
 
-                #Revaluates Weight array to the residules
-                weight = residWeight.copy()
-
-                csolns = weight.copy()
+                #makes csolns evaluation
+                csolns = evalWeight.copy()
                 # end of topK code
     
                 #change csolns back into a multidimensional array
