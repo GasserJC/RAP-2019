@@ -58,7 +58,7 @@ class Server(BaseFedarated):
   #------------------START OF CODE CHANGE WE WILL APPLY A TOP-K HERE--------------------#
                 
                 #this reformats the csolns matrix into a one dimensional array
-                csolns.reshape(740,1)
+                csolns.reshape(740,1) #emailed haijian about this being 7400x1 rather than 740x1
                 
                 #start of the manipulation code
                 weight = csolns.copy()
