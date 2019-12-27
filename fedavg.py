@@ -58,8 +58,7 @@ class Server(BaseFedarated):
   #------------------START OF CODE CHANGE WE WILL APPLY A TOP-K HERE--------------------#
                 
                 #this reformats the csolns matrix into a one dimensional array
-                csolns.reshape(740,1) #emailed haijian about this being 7400x1 rather than 740x1
-                
+                csolns.reshape(,) # have to dynamically reshape due to matrix size                
                 #start of the manipulation code
                 weight = csolns.copy()
                 
@@ -94,7 +93,7 @@ class Server(BaseFedarated):
                 # end of topK code
     
                 #change csolns back into a multidimensional array
-                csolns.reshape(740,10)
+                csolns.reshape(,) # dynamically reshape back to csolns orginal matrix size.
             
 #------------END OF TOP K ADDITION---------------------------
 
