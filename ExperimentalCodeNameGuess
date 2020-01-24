@@ -1,0 +1,20 @@
+model = tf.keras.Sequential([
+  tf.keras.layers.Dense(units=10, input_shape = [2]),
+  tf.keras.layers.Dense(128, activation=tf.nn.relu),
+  tf.keras.layers.Dense(32, activation=tf.nn.relu),
+  tf.keras.layers.Dense(2,  activation=tf.nn.softmax)
+])
+
+model.compile(optimizer='adam',
+              loss='binary_crossentropy',
+              metrics=['accuracy'])
+              
+BATCH_SIZE = 32
+for i in range( 0,24000 ):
+  train_names = names[i]
+
+for i in range( 24001 , 32951 ):
+  test_names = names[i]
+
+train_dataset = train_names
+test_dataset = test_names
