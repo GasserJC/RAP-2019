@@ -46,11 +46,9 @@ import logging
 logger = tf.get_logger()
 logger.setLevel(logging.ERROR)
 
-model = tf.keras.Sequential([
+model = tf.keras.Sequential([  # has accuarcy of ~71%
   tf.keras.layers.Dense(10, input_shape = (10,)), #guess work on this line
-  tf.keras.layers.Dense(128, activation=tf.nn.relu),
-  tf.keras.layers.Dense(128, activation=tf.nn.relu),
-  tf.keras.layers.Dense(32, activation=tf.nn.relu),
+  tf.keras.layers.Dense(64, activation = 'tanh'),
   tf.keras.layers.Dense(2,  activation=tf.nn.sigmoid)
 ])
 
@@ -61,4 +59,4 @@ model.compile(optimizer='adam',
 num_names = np.array(num_names)
 num_gender = np.array(num_gender)
 
-model.fit(num_names,num_gender)
+model.fit(num_names,num_gender, epochs = 10)
