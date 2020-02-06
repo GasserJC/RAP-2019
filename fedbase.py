@@ -2,19 +2,21 @@ import numpy as np
 import tensorflow as tf
 from tqdm import tqdm
 
-from flearn.models.client import Client
+from flearn.models.client import Client #client is the class for an indvidual node
 from flearn.utils.model_utils import Metrics
 from flearn.utils.tf_utils import process_grad
 
+#clients are the nodes
+#BaseFederated is a federated system of nodes
 
-class BaseFedarated(object):
+class BaseFedarated(object): #class for each a federated system
     def __init__(self, params, learner, dataset):
         # transfer parameters to self
-        for key, val in params.items(): setattr(self, key, val);
+        for key, val in params.items(): setattr(self, key, val);  
 
         # create worker nodes
         tf.reset_default_graph()
-        self.client_model = learner(*params['model_params'], self.inner_opt, self.seed)
+        self.client_model = learner(*params['model_params'], self.inner_opt, self.seed) #using client class objects
         self.clients = self.setup_clients(dataset, self.client_model)
         print('{} Clients in Total'.format(len(self.clients)))
         self.latest_model = self.client_model.get_params()
@@ -22,7 +24,7 @@ class BaseFedarated(object):
         # initialize system metrics
         self.metrics = Metrics(self.clients, params)
 
-    # Closes the object
+    # Closes the object / closes the federated system
     def __del__(self):
         self.client_model.close()
 
@@ -46,7 +48,8 @@ class BaseFedarated(object):
         tot_correct = []
         losses = []
 
-        for c in self.clients:
+        for c in self.clients:  # this loop tests all of the clients and returns their correct, loss, and # of samples 
+            # ct = total correct, cl = loss, ns = number of samples
             ct, cl, ns = c.train_error_and_loss()
             tot_correct.append(ct*1.0)  # Possibly appending the total correct from the previous line?
             num_samples.append(ns)  # Appending the number of samples into its array
@@ -76,7 +79,7 @@ class BaseFedarated(object):
         for c in self.clients:
             num_samples, client_grads = c.get_grads(self.latest_model) 
             samples.append(num_samples)
-            global_grads = np.add(global_grads, client_grads * num_samples)
+            global_grads = np.add(global_grads, client_grads * num_samples) #converts client gradient to same unit as global then adds to global grad
             intermediate_grads.append(client_grads)
 
         # Multiplys the global grad by one and divides by the sum of samples converted into an array
