@@ -79,7 +79,7 @@ class BaseFedarated(object): #class for each a federated system
         for c in self.clients:
             num_samples, client_grads = c.get_grads(self.latest_model) 
             samples.append(num_samples)
-            global_grads = np.add(global_grads, client_grads * num_samples) #converts client gradient to same unit as global then adds to global grad
+            global_grads = np.add(global_grads, client_grads * num_samples) #weighted client grad, mutliplies by number of samples.
             intermediate_grads.append(client_grads)
 
         # Multiplys the global grad by one and divides by the sum of samples converted into an array
