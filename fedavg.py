@@ -1,15 +1,15 @@
-import numpy as np
-from tqdm import trange, tqdm
-import tensorflow as tf
+import numpy as np             #mathematics library
+from tqdm import trange, tqdm  #progress bar
+import tensorflow as tf        #google machine learning library
 
-from .fedbase import BaseFedarated
-from flearn.utils.tf_utils import process_grad
+from .fedbase import BaseFedarated  #importing parent class from FedBase.py
+from flearn.utils.tf_utils import process_grad  #there is no process_grad in that file.
 
 
-class Server(BaseFedarated):
-    def __init__(self, params, learner, dataset):
+class Server(BaseFedarated): #creating server class, child class of BaseFederated
+    def __init__(self, params, learner, dataset): #constructor
         print('Using Federated avg to Train')
-        self.inner_opt = tf.train.GradientDescentOptimizer(params['learning_rate'])
+        self.inner_opt = tf.train.GradientDescentOptimizer(params['learning_rate']) # learning rate
         # Calls the base class to send the arguments needed for its constructor
         super(Server, self).__init__(params, learner, dataset)
 
