@@ -1,6 +1,6 @@
 import numpy as np             #mathematics library
 from tqdm import trange, tqdm  #progress bar
-import tensorflow as tf        #google machine learning library
+import tensorflow as tf        #machine learning library
 
 from .fedbase import BaseFedarated  #importing parent class from FedBase.py
 from flearn.utils.tf_utils import process_grad  #there is no process_grad in that file.
@@ -13,13 +13,14 @@ class Server(BaseFedarated): #creating server class, child class of BaseFederate
         # Calls the base class to send the arguments needed for its constructor
         super(Server, self).__init__(params, learner, dataset)
 
-    def train(self):
+    def train(self): #this function initiates the training of the clients/nodes
+                     #self refers to the Server/Entire federated system
         '''Train using Federated Proximal'''
-        print('Training with {} workers ---'.format(self.clients_per_round))
-
-        for i in range(self.num_rounds):
+        print('Training with {} workers ---'.format(self.clients_per_round)) #pritns # of participating nodes
+        
+        for i in range(self.num_rounds): #num_rounds is a member of BaseFederated and passed down to server
             # test model
-            if i % self.eval_every == 0:
+            if i % self.eval_every == 0: # << in client class
                 stats = self.test()  # have set the latest model for all clients
                 stats_train = self.train_error_and_loss()  # Have the clients train on the model and record errors
 
