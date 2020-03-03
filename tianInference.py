@@ -17,5 +17,12 @@
 #1) the code already is set up for dynamic model selection, therefore feeding the client a new model is easy.
 #2) Two methods: having a model that output layer == to the final layers weights (very-hard) or using a getWeights function that
 #.. can retrieve the weights at a layer and dynamically break the testing (prefered, (very-hard)).
+#3) The rest should be simple simulation.
 
+
+#Dynamic model selection means choosing when to break during testing, this would most easily be done by updating the model every x amount
+#seconds/tests/units. We would implement a set_models(model) function.
+
+#After dynamic breaking can be achieved we need to find away to get weights from the last layer. After recieving the weights we can 
+#easily transmit
     
