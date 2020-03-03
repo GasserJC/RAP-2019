@@ -1,27 +1,21 @@
 # this program is currently only going to be psuedocode and ideas
 # the end goal is initiating a simulated inference using tian's code.
 
-#Large issue one, tians code is only set up to train, not test. --> create a new file
-#Large issue two, incompatability, it is possible my code/resources will not work on older tensorflow  --> use tensorflow2/tf2 federated.
 
 #current approach, use weights = layer.get_weights() to pull weights from a single layer. We will start with a non-dynamic,
 #single chain model to reduce initial challenges.
 
-#going to use a new class, a child of Server
-
-from .fedavg import Server
-
-class InferenceServer(Server):
-    def __init__(self, params, learner, dataset): #constructor
-        print('Using Federated avg to Train')
-        self.inner_opt = tf.train.GradientDescentOptimizer(params['learning_rate']) # learning rate
-        # Calls the base class to send the arguments needed for its constructor
-        super(InferenceServer, self).__init__(params, learner, dataset)
-        
-    def test(self):
-        self.model.test(self.eval_data)
+#implement get weights during testing: (diffuculty) 
+#1st, have a dynamic model (easy)
+#2nd, have the test function return the weights (very hard)
+#3rd, transmit to the server class the weights (easy)
+#4th, train the residule weights on the new model (medium)
+#5th, return the final answer to the client, ( easy, we will start with classifaction, therefore we recieve an array resulting from softMax. )
+#6th, client returns the final answer given the result from server (easy)
          
         
-
+#1) the code already is set up for dynamic model selection, therefore feeding the client a new model is easy.
+#2) Two methods: having a model that output layer == to the final layers weights (very-hard) or using a getWeights function that
+#.. can retrieve the weights at a layer and dynamically break the testing (prefered, (very-hard)).
 
     
