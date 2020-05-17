@@ -34,60 +34,55 @@ for i in range(0,len(names)):   #this adds zero padding to the names and makes s
   names[i] = names[i].zfill(nmLen)
   names[i]= names[i].lower()
   
-  for i in range(0,len(names)):
+for i in range(0,len(names)):
   for j in range (0,nmLen):
       num_names[i][j] = ord(names[i][j])
-      num_names[i][j] = num_names[i][j] - 96 #Converts the ascii values to 0 through 27
+      num_names[i][j] = float(num_names[i][j] - 96) #Converts the ascii values to 0 through 27 (Improves Feature Optimization)
       
-  #converts the genders to integers
+#converts the genders to integers
 num_gender = [0 for i in range(len(gender))]
 for i in range(len(gender)):
   if(gender[i] == "M"): #MALE
     num_gender[i] = 0
   if(gender[i] == "F"): #FEMALE
     num_gender[i] = 1
+
 num_names = np.array(num_names) #converts num_names to a numpy array
 num_names = (np.arange(num_names.max()) == num_names[...,None]).astype(int)  #converts num_names into one_hot encoded
-
 import numpy as np
 import logging
 logger = tf.get_logger()
 logger.setLevel(logging.ERROR)
 
-BATCH = 800            
-L2_WEIGHT_DECAY = 2e-2 # experimented a few times with this value, seems this one is pretty good.
+BATCH = 800          # Increasing batch size increased accuracy until batch == 800.
+L2_WEIGHT_DECAY = 2e-2 # experimented a few times with this value, this one is optimal.
 
+layer1 = tf.keras.layers.Conv1D(256, kernel_size= 8, input_shape = (nmLen,26,),          # Convolutional layer, using a kernel and bias,
+                         use_bias = True, bias_initializer = 'random_uniform',    #bias is optiized using a weight decay regulizer.
+                         bias_regularizer=tf.keras.regularizers.l2(L2_WEIGHT_DECAY), )
+layer2 = tf.keras.layers.SeparableConv1D(256, kernel_size = 2, input_shape = (2,256),                   #this layer works the same as the prior, altough the convolution is in a
+                        trainable = True,  use_bias = True, bias_initializer = 'random_uniform', #different vector direction, 
+                         bias_regularizer=tf.keras.regularizers.l2(L2_WEIGHT_DECAY),)
+layer3 = tf.keras.layers.LeakyReLU(alpha=0.15)#gradient descent with leaky RELU, learning rate = alpha
+layer4 = tf.keras.layers.Dense(128, activation = 'relu')
+layer5 =tf.keras.layers.Dropout(rate = .25, noise_shape=(BATCH, 1) )    #drop out layer, decreasing % increases learning speed, but decreases max accuracy.
+layer6 = tf.keras.layers.Dense(64, activation = 'selu')
+layer7 = tf.keras.layers.Dropout(rate = .3, noise_shape=(BATCH, 1) ) #selu was higher accuracy than relu
+layer8 =tf.keras.layers.Dense(64, activation = 'relu')
+layer9 = tf.keras.layers.Dense(32,  activation = 'relu')
+layer10 = tf.keras.layers.Dense(2, activation = 'softmax') #softplus is supperior to softmax for this algorithm
 
 model = tf.keras.Sequential([
+  layer1, layer2,
 
-  tf.keras.layers.Conv1D(256, kernel_size= 8, input_shape = (nmLen,26,),          # Convolutional layer, using a kernel and bias,
-                         use_bias = True, bias_initializer = 'random_uniform',    #bias is optiized using a weight decay regulizer.
-                         bias_regularizer=tf.keras.regularizers.l2(L2_WEIGHT_DECAY), ),
-
-  tf.keras.layers.SeparableConv1D(256, kernel_size = 2, input_shape = (2,256),                   #this layer works the same as the prior, altough the convolution is in a
-                        trainable = True,  use_bias = True, bias_initializer = 'random_uniform', #different vector direction, 
-                         bias_regularizer=tf.keras.regularizers.l2(L2_WEIGHT_DECAY),),
-  
   tf.keras.layers.Flatten(),    #returns to two dimensional nueral network, can only use fully connected now
 
-  tf.keras.layers.LeakyReLU(alpha=0.15),    #gradient descent with leaky RELU, learning rate = alpha
+  layer3, layer4, layer5, layer6, layer7, layer8, layer9, layer10])
 
-  tf.keras.layers.Dense(128, activation = 'relu'), 
-  tf.keras.layers.Dropout(rate = .25, noise_shape=(BATCH, 1) ),    #drop out layer, decreasing % increases learning speed, but decreases max accuracy.
+model.compile (optimizer='adamax',
+              loss= 'sparse_categorical_crossentropy',
+              metrics=['accuracy'])                # accuracy is what we want to have
 
-  tf.keras.layers.Dense(64, activation = 'selu'), 
-  tf.keras.layers.Dropout(rate = .3, noise_shape=(BATCH, 1) ), #selu was higher accuracy than relu
-
-  tf.keras.layers.Dense(64, activation = 'relu'), 
-
-  tf.keras.layers.Dense(32,  activation = 'relu'),
-
-  tf.keras.layers.Dense(2, activation = 'softplus') #softplus is supperior to softmax for this algorithm
-])
-
-model.compile(optimizer='adam',                        #adam is the most optimal
-              loss= 'sparse_categorical_crossentropy', #sparse_categorical_crossentropy is the most optimal
-              metrics=['accuracy'])                    # accuracy is what we want to have
 
 #uniformally shuffles the data, such that the gender and names still have their same assignments.
 def shuffle_in_unison(a, b):
@@ -104,8 +99,7 @@ num_gender = np.array(num_gender)
 num_names, num_gender = shuffle_in_unison(num_names, num_gender)
 
 
-model.fit(num_names[:100000],num_gender[:100000], batch_size = BATCH, epochs = 600, validation_data = (num_names[100000:], num_gender[100000:]), verbose = 1)
-
+model.fit(num_names[:100000],num_gender[:100000], batch_size = BATCH, epochs = 20, validation_data = (num_names[100000:], num_gender[100000:]), verbose = 1)
 
 predict_guess = [ 'tyler' ]
 namePred = [ 'tyler' ]
